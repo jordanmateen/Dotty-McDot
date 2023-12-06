@@ -12,6 +12,7 @@ interface Dots {
 
 function App() {
   const [dots, setDots] = useState<Dots[]>([])
+  const [redoDotsQueue, setRedoDotsQueue] = useState<Dots[]>([])
 
   const draw = (e: MouseEvent) => {
     console.log(e)
@@ -19,14 +20,38 @@ function App() {
     setDots([...dots, {x: clientX, y: clientY}])
   }
 
-  console.log(dots)
+  const undo = () => {
+    if(dots.length > 0){
+      const newDots = [...dots]
+      const lastDot = newDots.pop() as Dots
+      setRedoDotsQueue([...redoDotsQueue, lastDot])
+      setDots([...newDots])
+    }
+
+    if(dots.length === 0){
+      alert('Nothing to undo, Happy Clicking!!')
+    }
+  }
+
+  const redo = () => {
+    if(redoDotsQueue.length > 0){
+      const newQueue = [...redoDotsQueue]
+      const lastQueuedItem = newQueue.pop() as Dots
+      setRedoDotsQueue(newQueue)
+      setDots([...dots, lastQueuedItem])
+    }
+
+    if(redoDotsQueue.length === 0){
+      alert('Nothing to Redo, Sorry champ that\'s it')
+    }
+  }
 
   return (
     <>
       <ContainerSyles.AppWrapper>
         <ContainerSyles.ButtonWrapper>
-          <button>Undo</button>
-          <button>Redo</button>
+          <button onClick={undo}>Undo</button>
+          <button  onClick={redo}>Redo</button>
         </ContainerSyles.ButtonWrapper>
 
         <ContainerSyles.ClickZone className='dot-zone' onClick={draw}>
